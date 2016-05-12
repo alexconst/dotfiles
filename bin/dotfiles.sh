@@ -93,16 +93,18 @@ stow_exec () {
 # Since stow doesn't support "merging" we need to hammer it
 # It is really corner case pilling, eg: handling private history file or config
 hammer_time () {
-    items=($(cd "$1" ; find . -print | tail -n+2))
+    src_dir="$1"
+    dst_dir="${2:-$HOME}"
+    items=($(cd "$src_dir" ; find . -print | tail -n+2))
     for item in "${items[@]}"; do
-        src=$(readlink -f "$1/$item")
-        dst="$HOME/${item#./}"
-        dst=$(readlink -f $dst)
+        src=$(readlink -f "$src_dir/$item")
+        dst_lnk="$dst_dir/${item#./}"
+        dst=$(readlink -f $dst_lnk)
         #echo "$item"
         #echo "src = $src"
         #echo "dst = $dst"
         # if $src and $dst point to same file, then nothing to do here
-        if [[ "$src" == "$dst" ]]; then
+        if [[ "$src" == "$dst" ]] && [[ "$mode_delete" -eq 0 ]]; then
             printf -- "- Nothing to do since source and dest are the same: $src\n"
             continue
         fi
@@ -120,10 +122,9 @@ hammer_time () {
         fi
         # handle files
         if [[ -f "$src" ]]; then
-            cmd="zzzzzzzz"
             if [[ -f "$dst" ]]; then
                 if [[ "$mode_delete" -eq 1 ]]; then
-                    cmd="rm $dst"
+                    cmd="rm $dst_lnk"
                     printf "+ Link will be removed: $cmd\n"
                 else
                     cmd="ln -sf $src $dst"
