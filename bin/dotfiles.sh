@@ -77,8 +77,6 @@ zsh_install () {
         if [[ -f "$HOME/.zshenv" ]]; then
             source "$HOME/.zshenv"
         fi
-        #rm -f "${ZDOTDIR:-$HOME}/.zprezto"
-        #ln -s "${ZDOTDIR:-$HOME}/.zgen/sorin-ionescu/prezto-master" "${ZDOTDIR:-$HOME}/.zprezto"
     fi
 }
 
@@ -99,9 +97,7 @@ if [[ "$mode_update" -eq 1 ]]; then
     exit 0
 fi
 
-#if [[ "$mode_install" -eq 1 ]]; then
-    mkdir -p "${MYHOME:-$HOME}/bin"
-#fi
+mkdir -p "${MYHOME:-$HOME}/bin"
 
 
 zsh_install
