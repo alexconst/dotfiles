@@ -49,7 +49,7 @@ stow_opts="--ignore='swp' --verbose=2"
 mode_execute=0
 mode_delete=0
 mode_modify=0
-mode_upstream=0
+mode_update=0
 case $mode in
     -s|--simulate)
         stow_opts+=" -n"
@@ -70,7 +70,7 @@ case $mode in
         mode_delete=1
         ;;
     -u|--update)
-        mode_upstream=1
+        mode_update=1
         ;;
     *)
         usage
@@ -165,6 +165,11 @@ zsh_install () {
     fi
 }
 
+zsh_update () {
+    cd "${ZDOTDIR:-$HOME}"
+    
+}
+
 bin_install () {
     if [[ -d "${dotfiles}/bin" ]]; then
         eval "stow ${stow_opts} -d ${dotfiles} -t ${MYHOME:-$HOME}/bin bin"
@@ -177,14 +182,13 @@ bin_install () {
 ###############################################################################
 # EXECUTION
 ###############################################################################
-if [[ "$mode_upstream" -eq 1 ]]; then
-    # TODO git pulls
-    exit 0
+if [[ "$mode_update" -eq 1 ]]; then
+    zsh_update
+else
+    mkdir -p "${MYHOME:-$HOME}/bin"
+
+    zsh_install
+    bin_install
 fi
 
-mkdir -p "${MYHOME:-$HOME}/bin"
-
-
-zsh_install
-bin_install
 
