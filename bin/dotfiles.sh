@@ -150,7 +150,7 @@ hammer_time () {
 zsh_install () {
     if [[ "$public" -eq 1 ]]; then
         stow_exec "zsh"
-        if [[ "$mode_execute" -eq 1 ]]; then
+        if [[ "$mode_modify" -eq 1 ]]; then
             if [[ -f "$HOME/.zshenv" ]]; then
                 source "$HOME/.zshenv"
             fi
