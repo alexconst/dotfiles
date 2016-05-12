@@ -29,8 +29,7 @@ if [[ $# -lt 1 ]]; then
     usage
 fi
 mode="$1"
-dotfiles="$2"
-
+dotfiles="$(readlink -f $2 )"
 
 # ignore option ignores files ending in Perl regex (so no need for .*)
 stow_opts="--ignore='swp' --verbose=2"
@@ -84,7 +83,9 @@ zsh_install () {
 }
 
 bin_install () {
-    eval "stow ${stow_opts} -d ${dotfiles} -t ${MYHOME:-$HOME}/bin bin"
+    if [[ -d "${dotfiles}/bin" ]]; then
+        eval "stow ${stow_opts} -d ${dotfiles} -t ${MYHOME:-$HOME}/bin bin"
+    fi
 }
 
 
