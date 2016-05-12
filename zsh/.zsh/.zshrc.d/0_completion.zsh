@@ -21,3 +21,6 @@ zstyle ':completion:*' completer \
 # overwrite prezto settings to support completion for functions starting with two underscores
 zstyle ':completion:*:functions' ignored-patterns '(_[^_]*|pre(cmd|exec))'
 
+# add completion for parent dirs (ie: ../)
+zstyle ':completion:*' special-dirs true
+
