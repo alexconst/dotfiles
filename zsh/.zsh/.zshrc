@@ -1,7 +1,7 @@
 # only required until my PR is merged https://github.com/tarjoilija/zgen/pull/67
 export ZGEN_DIR="${ZDOTDIR:-$HOME}/.zgen"
 # automatically regenerate init files on changes
-export ZGEN_RESET_ON_CHANGE=(${ZDOTDIR:-$HOME}/.zshrc)
+ZGEN_RESET_ON_CHANGE=(${ZDOTDIR:-$HOME}/.zshrc)
 # set prezto repo to my own fork
 export ZGEN_PREZTO_REPO="alexconst"
 
