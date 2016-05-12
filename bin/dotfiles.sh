@@ -31,31 +31,48 @@ fi
 mode="$1"
 dotfiles="$(readlink -f $2 )"
 
+if [[ "$dotfiles" =~ "private" ]]; then
+    private=1
+    public=0
+else
+    private=0
+    public=1
+fi
+
 # ignore option ignores files ending in Perl regex (so no need for .*)
 stow_opts="--ignore='swp' --verbose=2"
-mode_install=0
-mode_update=0
+mode_modify=0
+mode_delete=0
+mode_upstream=0
 case $mode in
     -s|--simulate)
         stow_opts+=" -n"
         ;;
     -e|--execute)
-        mode_install=1
+        mode_modify=1
         ;;
     -r|--reexecute)
         stow_opts+=" -R"
-        mode_install=1
+        mode_modify=1
         ;;
     -d|--delete)
         stow_opts+=" -D"
+        mode_delete=1
+        mode_modify=1
         ;;
     -u|--update)
-        mode_update=1
+        mode_upstream=1
         ;;
     *)
         usage
         ;;
 esac
+
+if [[ "$mode_modify" -eq 0 ]]; then
+    printf "SIMULATION MODE: no changes will be made\n\n"
+else
+    printf "EXECUTION MODE: file system changes will be done\n\n"
+fi
 
 
 
@@ -71,12 +88,69 @@ stow_exec () {
     printf "\n"
 }
 
-zsh_install () {
-    stow_exec "zsh"
-    if [[ "$mode_install" -eq 1 ]]; then
-        if [[ -f "$HOME/.zshenv" ]]; then
-            source "$HOME/.zshenv"
+
+# Recursively creates a symbolic link for each file
+# Since stow doesn't support "merging" we need to hammer it
+# It is really corner case pilling, eg: handling private history file or config
+hammer_time () {
+    items=($(cd "$1" ; find . -print | tail -n+2))
+    for item in "${items[@]}"; do
+        src=$(readlink -f "$1/$item")
+        dst="$HOME/${item#./}"
+        dst=$(readlink -f $dst)
+        #echo "$item"
+        #echo "src = $src"
+        #echo "dst = $dst"
+        # if $src and $dst point to same file, then nothing to do here
+        if [[ "$src" == "$dst" ]]; then
+            printf -- "- Nothing to do since source and dest are the same: $src\n"
+            continue
         fi
+        # handle directories
+        if [[ -d "$src" ]]; then
+            if [[ -d "$dst" ]]; then
+                printf -- "- Nothing to do since destination directory already exists: $dst\n"
+            else
+                cmd="mkdir -p $dst"
+                printf "+ Will execute command: $cmd\n"
+                if [[ "$mode_modify" -eq 1 ]]; then
+                    eval "$cmd"
+                fi
+            fi
+        fi
+        # handle files
+        if [[ -f "$src" ]]; then
+            cmd="zzzzzzzz"
+            if [[ -f "$dst" ]]; then
+                if [[ "$mode_delete" -eq 1 ]]; then
+                    cmd="rm $dst"
+                    printf "+ Link will be removed: $cmd\n"
+                else
+                    cmd="ln -sf $src $dst"
+                    printf "+ File '$dst' will be overwriten with link to '$src'\n"
+                fi
+            else
+                cmd="ln -sf $src $dst"
+                printf "+ Link will be created: $cmd\n"
+            fi
+            if [[ "$mode_modify" -eq 1 ]]; then
+                eval "$cmd"
+            fi
+        fi
+    done
+}
+
+
+zsh_install () {
+    if [[ "$public" -eq 1 ]]; then
+        stow_exec "zsh"
+        if [[ "$mode_modify" -eq 1 ]]; then
+            if [[ -f "$HOME/.zshenv" ]]; then
+                source "$HOME/.zshenv"
+            fi
+        fi
+    else
+        hammer_time "zsh"
     fi
 }
 
@@ -92,7 +166,7 @@ bin_install () {
 ###############################################################################
 # EXECUTION
 ###############################################################################
-if [[ "$mode_update" -eq 1 ]]; then
+if [[ "$mode_upstream" -eq 1 ]]; then
     # TODO git pulls
     exit 0
 fi
