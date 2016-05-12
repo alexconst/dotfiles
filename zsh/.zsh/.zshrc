@@ -2,8 +2,9 @@
 export ZGEN_DIR="${ZDOTDIR:-$HOME}/.zgen"
 # automatically regenerate init files on changes
 export ZGEN_RESET_ON_CHANGE=(${ZDOTDIR:-$HOME}/.zshrc)
-# set prezto repo to own fork
+# set prezto repo to my own fork
 export ZGEN_PREZTO_REPO="alexconst"
+
 # initialize/load zgen
 source "${ZDOTDIR:-$HOME}/.zgen/zgen.zsh"
 
