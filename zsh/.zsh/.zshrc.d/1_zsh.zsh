@@ -15,6 +15,9 @@ setopt incappendhistory
 # ignore commands that start with a leading space
 setopt histignorespace
 
+# fix prezto annoyance
+unsetopt share_history
+
 # allow comments (lines starting with #) when using an interactive shell
 setopt interactivecomments
 
