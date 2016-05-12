@@ -41,8 +41,9 @@ fi
 
 # ignore option ignores files ending in Perl regex (so no need for .*)
 stow_opts="--ignore='swp' --verbose=2"
-mode_modify=0
+mode_execute=0
 mode_delete=0
+mode_modify=0
 mode_upstream=0
 case $mode in
     -s|--simulate)
@@ -50,15 +51,18 @@ case $mode in
         ;;
     -e|--execute)
         mode_modify=1
+        mode_execute=1
         ;;
     -r|--reexecute)
         stow_opts+=" -R"
         mode_modify=1
+        mode_execute=1
+        mode_delete=1
         ;;
     -d|--delete)
         stow_opts+=" -D"
-        mode_delete=1
         mode_modify=1
+        mode_delete=1
         ;;
     -u|--update)
         mode_upstream=1
@@ -115,7 +119,7 @@ hammer_time () {
             else
                 cmd="mkdir -p $dst"
                 printf "+ Will execute command: $cmd\n"
-                if [[ "$mode_modify" -eq 1 ]]; then
+                if [[ "$mode_execute" -eq 1 ]]; then
                     eval "$cmd"
                 fi
             fi
@@ -126,9 +130,10 @@ hammer_time () {
                 if [[ "$mode_delete" -eq 1 ]]; then
                     cmd="rm $dst_lnk"
                     printf "+ Link will be removed: $cmd\n"
-                else
+                fi
+                if [[ "$mode_execute" -eq 1 ]]; then
                     cmd="ln -sf $src $dst"
-                    printf "+ File '$dst' will be overwriten with link to '$src'\n"
+                    printf "+ File/link '$dst' will be replaced with a symbolic link to '$src'\n"
                 fi
             else
                 cmd="ln -sf $src $dst"
@@ -145,7 +150,7 @@ hammer_time () {
 zsh_install () {
     if [[ "$public" -eq 1 ]]; then
         stow_exec "zsh"
-        if [[ "$mode_modify" -eq 1 ]]; then
+        if [[ "$mode_execute" -eq 1 ]]; then
             if [[ -f "$HOME/.zshenv" ]]; then
                 source "$HOME/.zshenv"
             fi
