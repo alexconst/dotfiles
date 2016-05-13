@@ -17,6 +17,7 @@ The adopted convention for private files is the same used by [YADR](https://gith
 1. logout and login
 
 (*) add/merge your private dotfiles (directory must have substring `private` in its name)
+
 1. `cd dotfiles_private`
 1. execute `./dotfiles.sh -e .`
 
