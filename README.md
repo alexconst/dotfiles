@@ -49,16 +49,14 @@ vagrant ssh
 cd $MYHOME/dotfiles
 
 # update using remote 'origin'
-# simulate
-./dotfiles.sh -g . origin
-# update
-./dotfiles.sh -u . origin
-
+remote="origin"
 # update using remote 'upstream'
+remote="upstream"
+
 # simulate
-./dotfiles.sh -g . upstream
+./dotfiles.sh -g . "$remote"
 # update
-./dotfiles.sh -u . upstream
+./dotfiles.sh -u . "$remote"
 ```
 
 
