@@ -7,17 +7,58 @@ Supports both public (eg: github) and private (eg: your private server) repos. I
 The adopted convention for private files is the same used by [YADR](https://github.com/skwp/dotfiles), where they use the suffix `*.user` (and eventual secrets will be stored in `.secrets`).
 
 
-# How to
+# Install
 
-1. fork or clone this repo
-1. `export MYHOME=$HOME/...` if you want `bin` saved somewhere else
-1. `cd dotfiles`
-1. execute `./dotfiles.sh -e .`
-1. optional (*)
-1. logout and login
+```bash
+setopt interactivecomments
 
-(*) add/merge your private dotfiles (directory must have substring `private` in its name)
+# set "home" directory
+export MYHOME="$HOME/home"
+mkdir -p "$MYHOME" && cd "$MYHOME"
+# work around catch22 to get github SSH keypair
+cp -p -r /vagrant/dotfiles_private "$MYHOME/"
+# deploy github SSH keypair
+cp -p $MYHOME/dotfiles_private/ssh/.ssh/* $HOME/.ssh/
+chmod 600 $HOME/.ssh/github_rsa
 
-1. `cd dotfiles_private`
-1. execute `./dotfiles.sh -e .`
+# clone this repo
+git clone git@github:alexconst/dotfiles.git
+cd dotfiles
+# bootstrap submodules
+git submodule init
+git submodule update
+# simulate
+./dotfiles.sh -s .
+# deploy dotfiles
+./dotfiles.sh -e .
+
+# deploy private dotfiles (directory must have substring `private` in its name)
+cd ../dotfiles_private
+../dotfiles/dotfiles.sh -s .
+../dotfiles/dotfiles.sh -e .
+
+# logout and login
+exit
+vagrant ssh
+```
+
+
+# Update
+
+```bash
+cd $MYHOME/dotfiles
+
+# update using remote 'origin'
+# simulate
+./dotfiles.sh -g . origin
+# update
+./dotfiles.sh -u . origin
+
+# update using remote 'upstream'
+# simulate
+./dotfiles.sh -g . upstream
+# update
+./dotfiles.sh -u . upstream
+```
+
 
