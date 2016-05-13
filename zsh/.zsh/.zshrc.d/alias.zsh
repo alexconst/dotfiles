@@ -4,7 +4,9 @@
 
 # clear some annoying prezto aliases (for more check https://github.com/sorin-ionescu/prezto/blob/master/modules/utility/init.zsh )
 unalias ls
-
+unalias grep
+alias grep='nocorrect grep'
+alias grepc='grep --color=auto'
 # work around some of prezto annoyances/bugs
 unfunction diff
 
