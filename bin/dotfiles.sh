@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env zsh
 
 
 ###############################################################################
@@ -16,9 +16,11 @@ usage() {
     printf "        %-30s %s\n" "-r | --reexecute" "delete links and then link them again"
     printf "    %-34s %s\n" "<dir>" "source dotfiles dir (eg: \$HOME/dotfiles)"
     printf "dotfile plugin update:\n"
-    printf "    $(basename $0) <command> <remote>\n"
+    printf "    $(basename $0) <command> <dir> <remote>\n"
     printf "    <command>\n"
-    printf "        %-30s %s\n" "-u | --update" "update installed plugins"
+    printf "        %-30s %s\n" "-u | --update" "update installed plugins from 'upstream' and also push to 'origin'"
+    printf "        %-30s %s\n" "-g | --gimulate" "do not perform any changes, just print what would be done with git"
+    printf "    %-34s %s\n" "<dir>" "source dotfiles dir (eg: \$HOME/dotfiles)"
     printf "    %-34s %s\n" "<remote>" "with <remote> being 'origin' or 'upstream'"
     printf "\n"
     exit 1
@@ -30,19 +32,18 @@ usage() {
 ###############################################################################
 # ARGUMENT PARSING
 ###############################################################################
+# TODO: replace with getopt
+
 if [[ $# -lt 1 ]]; then
     usage
 fi
 mode="$1"
 dotfiles="$(readlink -f $2 )"
-
-if [[ "$dotfiles" =~ "private" ]]; then
-    private=1
-    public=0
-else
-    private=0
-    public=1
+if [[ -z "$dotfiles" ]]; then
+    printf "ERROR: no such directory: $2\n"
+    exit 2
 fi
+remote="$3"
 
 # ignore option ignores files ending in Perl regex (so no need for .*)
 stow_opts="--ignore='swp' --verbose=2"
@@ -50,6 +51,7 @@ mode_execute=0
 mode_delete=0
 mode_modify=0
 mode_update=0
+mode_gimulate=0
 case $mode in
     -s|--simulate)
         stow_opts+=" -n"
@@ -71,11 +73,23 @@ case $mode in
         ;;
     -u|--update)
         mode_update=1
+        mode_modify=1
+        ;;
+    -g|--gimulate)
+        mode_gimulate=1
         ;;
     *)
         usage
         ;;
 esac
+
+if [[ "$dotfiles" =~ "private" ]]; then
+    private=1
+    public=0
+else
+    private=0
+    public=1
+fi
 
 if [[ "$mode_modify" -eq 0 ]]; then
     printf "SIMULATION MODE: no changes will be made\n\n"
@@ -165,9 +179,52 @@ zsh_install () {
     fi
 }
 
+cmd_exec () {
+    cmd="$@"
+    curr_dir=$(pwd)
+    printf "%-100s %s\n" "+ Will execute command: $cmd" "Work dir: $curr_dir" 
+    if [[ "$mode_gimulate" -eq 0 ]] && [[ "$mode_simulate" -eq 0 ]]; then
+        eval "$cmd"
+    fi
+}
+
+git_pull_push () {
+    git remote | grep "upstream" >/dev/null
+    if [[ "$?" -eq 0 ]]; then
+        cmd="git pull -u upstream master"
+        cmd_exec "$cmd"
+        cmd="git push -u origin master"
+        cmd_exec "$cmd"
+    else
+        cmd="git pull -u origin master"
+        cmd_exec "$cmd"
+    fi
+}
+
 zsh_update () {
-    cd "${ZDOTDIR:-$HOME}"
-    
+    if [[ -f "$HOME/.zshenv" ]]; then
+        source "$HOME/.zshenv"
+    fi
+    cd "${ZDOTDIR:-$HOME}/.zgen"
+    #echo "$dotfiles"
+    #echo "$remote"
+    if [[ "$remote" == "origin" ]]; then
+        cmd="true"
+        cmd_exec "$cmd"
+    elif [[ "$remote" == "upstream" ]]; then
+        cd ../.zprezto
+        git_pull_push
+        cd ../.zgen
+        git_pull_push
+    else
+        printf "ERROR: '$remote' is not a valid remote. Only 'origin' and 'upstream' are suported.\n"
+        exit 3
+    fi
+    source "${ZDOTDIR:-$HOME}/.zgen/zgen.zsh"
+    cmd="zgen update"
+    cmd_exec "$cmd"
+    cmd="zgen selfupdate"
+    cmd_exec "$cmd"
 }
 
 bin_install () {
@@ -182,7 +239,7 @@ bin_install () {
 ###############################################################################
 # EXECUTION
 ###############################################################################
-if [[ "$mode_update" -eq 1 ]]; then
+if [[ "$mode_update" -eq 1 ]] || [[ "$mode_gimulate" -eq 1 ]]; then
     zsh_update
 else
     mkdir -p "${MYHOME:-$HOME}/bin"
