@@ -230,7 +230,7 @@ zsh_update () {
     source "${ZDOTDIR:-$HOME}/.zgen/zgen.zsh"
     cmd="zgen update"
     cmd_exec "$cmd"
-    cmd="git checkout master ; zgen selfupdate"
+    cmd="zgen selfupdate"
     cmd_exec "$cmd"
 }
 
