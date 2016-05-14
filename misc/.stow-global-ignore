@@ -1,0 +1,24 @@
+# Comments and blank lines are allowed.
+# The only change from default was the removal of '\.gitignore' from this list.
+# https://lists.gnu.org/archive/html/help-stow/2015-11/msg00000.html
+# https://www.gnu.org/software/stow/manual/html_node/Types-And-Syntax-Of-Ignore-Lists.html#Types-And-Syntax-Of-Ignore-Lists
+
+RCS
+.+,v
+
+CVS
+\.\#.+       # CVS conflict files / emacs lock files
+\.cvsignore
+
+\.svn
+_darcs
+\.hg
+
+\.git
+
+.+~          # emacs backup files
+\#.*\#       # emacs autosave files
+
+^/README.*
+^/LICENSE.*
+^/COPYING
