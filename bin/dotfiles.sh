@@ -251,6 +251,14 @@ bin_install () {
     fi
 }
 
+misc_install () {
+    target="$1"
+    if [[ "$public" -eq 1 ]]; then
+        stow_exec "$target"
+    else
+        hammer_time "$target"
+    fi
+}
 
 
 
@@ -270,6 +278,7 @@ else
 
     zsh_install
     bin_install
+    misc_install "misc"
 fi
 
 

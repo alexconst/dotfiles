@@ -1,0 +1,94 @@
+[core]
+    pager = less -+$LESS -R
+    excludesfile = ~/.gitignore
+
+[color]
+    ui = auto
+;[color "diff"]
+        ;meta = blue black bold
+[color "diff"]
+    plain = white
+    meta = blue bold
+    frag = cyan
+    old = red
+    new = green
+    commit = yellow
+    whitespace = normal red
+[color "branch"]
+    current = yellow bold reverse
+    local = yellow bold
+    remote = blue bold
+[color "status"]
+    header = white
+    branch = yellow bold reverse
+    added = blue
+    changed = magenta
+    untracked = cyan
+
+
+[alias]
+    # basics
+    st = status
+    co = checkout
+    br = branch
+    # list all branches
+    lab = branch -a
+    # list branches visualize as a tree
+    # lbt = log --graph --full-history --all --pretty=format:"%h%x09%d%x20%s"
+    # lbd = $HOME/bin/git-branches.sh
+
+    # always creating a commit object avoids losing information
+    menoff = merge --no-ff
+
+    # commits
+    ci = commit
+    civ = commit -v
+    civa = commit -v -a
+
+    # diffs
+    df = diff
+    dc = diff --cached
+    dh = diff HEAD                              # show both staged and unstaged changes
+    ds = !git --no-pager diff --stat -r HEAD    # show differences summary
+    dw = diff --word-diff
+
+    # list tags and corresponding tag message:
+    ltm = tag -l -n1
+    # list tags and corresponding timestamp:
+    ltt = log --tags --simplify-by-decoration --pretty='format:%ai %d'
+    # list tags and associated commit:
+    ltc = show-ref --tags
+
+    # logs
+    lg = log -p                                 # show log with associated patch
+    who = shortlog -s --
+
+    # log one liner
+    lol = log --oneline
+    # log with statistics on file changes
+    lst = log --stat
+    # list commit history for current branch
+    lbh = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative
+    # list it all! all commits for all branch with full information (most verbose one)
+    lia = log --graph --pretty=format:'%Cred%h%Creset %C(yellow)%d%Creset %s %Cgreen(%cr, %ad) %C(bold blue)(%an <%ae>)%Creset' --date=iso --abbrev-commit --full-history --all
+
+    # file history changes
+    # https://stackoverflow.com/questions/278192/view-the-change-history-of-a-file-using-git-versioning/5493663#5493663
+    lfh = log --follow -p --
+
+    # dealing with conflicts
+    gitkconflict = !gitk --left-right HEAD...MERGE_HEAD
+
+
+
+
+# this setting could have been done instead in .git/config
+;[merge "verify"]
+;    name = force conflicts during merge
+;    driver = $HOME/home/root/bin/git_mergemanual.sh %A %O %B
+
+
+
+[include]
+    path = .gitconfig.user
+
