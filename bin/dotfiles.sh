@@ -18,6 +18,7 @@ usage() {
     printf "dotfile plugin update:\n"
     printf "    $(basename $0) <command> <dir> <remote>\n"
     printf "    <command>\n"
+    printf "        %-30s %s\n" "-a | --add" "add predefined upstream repos"
     printf "        %-30s %s\n" "-u | --update" "update installed plugins from 'upstream' and also push to 'origin'"
     printf "        %-30s %s\n" "-g | --gimulate" "do not perform any changes, just print what would be done with git"
     printf "    %-34s %s\n" "<dir>" "source dotfiles dir (eg: \$HOME/dotfiles)"
@@ -52,6 +53,7 @@ mode_delete=0
 mode_modify=0
 mode_update=0
 mode_gimulate=0
+mode_add=0
 case $mode in
     -s|--simulate)
         stow_opts+=" -n"
@@ -70,6 +72,10 @@ case $mode in
         stow_opts+=" -D"
         mode_modify=1
         mode_delete=1
+        ;;
+    -a|--add)
+        mode_add=1
+        mode_modify=1
         ;;
     -u|--update)
         mode_update=1
@@ -196,6 +202,7 @@ git_pull_push () {
         cmd="git push -u origin master"
         cmd_exec "$cmd"
     else
+        printf "WARNING: no remote upstream defined\n"
         cmd="git pull -u origin master"
         cmd_exec "$cmd"
     fi
@@ -207,7 +214,7 @@ zsh_update () {
     fi
     cd "${ZDOTDIR:-$HOME}/.zgen"
     #echo "$dotfiles"
-    #echo "$remote"
+    #echo "remote = '$remote'"
     if [[ "$remote" == "origin" ]]; then
         cmd="true"
         cmd_exec "$cmd"
@@ -223,7 +230,18 @@ zsh_update () {
     source "${ZDOTDIR:-$HOME}/.zgen/zgen.zsh"
     cmd="zgen update"
     cmd_exec "$cmd"
-    cmd="zgen selfupdate"
+    cmd="git checkout master ; zgen selfupdate"
+    cmd_exec "$cmd"
+}
+
+zsh_add () {
+    cd "${ZDOTDIR:-$HOME}/.zgen"
+    cmd="git remote add upstream git@github:tarjoilija/zgen.git"
+    cmd_exec "$cmd"
+    cd "${ZDOTDIR:-$HOME}/.zprezto"
+    cmd="git remote set-url origin git@github:alexconst/prezto.git"
+    cmd_exec "$cmd"
+    cmd="git remote add upstream git@github:sorin-ionescu/prezto.git"
     cmd_exec "$cmd"
 }
 
@@ -239,8 +257,14 @@ bin_install () {
 ###############################################################################
 # EXECUTION
 ###############################################################################
+
+# update tools
 if [[ "$mode_update" -eq 1 ]] || [[ "$mode_gimulate" -eq 1 ]]; then
     zsh_update
+# add upstream repos metadata
+elif [[ "$mode_add" -eq 1 ]]; then
+    zsh_add
+# deploy the dotfiles
 else
     mkdir -p "${MYHOME:-$HOME}/bin"
 

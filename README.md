@@ -60,3 +60,7 @@ remote="upstream"
 ```
 
 
+# TODO
+
+- rewrite `dotfiles.sh` (using getops) because it grew up to be a little monster
+
