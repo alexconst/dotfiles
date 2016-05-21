@@ -2,7 +2,7 @@
 
 Deploys dotfiles into new system.
 Supports both public (eg: github) and private (eg: your private server) repos. It "merges" (ie, links) the files in the private repo to `$HOME` (which typically means directories in the public repo).
-*Smooth!*
+*smooth*
 
 The adopted convention for private files is the same used by [YADR](https://github.com/skwp/dotfiles), where they use the suffix `*.user` (and eventual secrets will be stored in `.secrets`).
 
@@ -18,12 +18,14 @@ mkdir -p "$MYHOME" && cd "$MYHOME"
 # work around catch22 to get github SSH keypair
 cp -p -r /vagrant/dotfiles_private "$MYHOME/"
 # deploy github SSH keypair
-cp -p $MYHOME/dotfiles_private/ssh/.ssh/* $HOME/.ssh/
-chmod 600 $HOME/.ssh/github_rsa
+for item in `find $MYHOME/dotfiles_private/ssh/.ssh/ -type f`; do ln -s `readlink -f "$item"` $HOME/.ssh/; done
+chmod 600 `readlink -f $HOME/.ssh/github_rsa`
 
 # clone this repo
 git clone git@github:alexconst/dotfiles.git
 cd dotfiles
+# tweak submodules to use your own repos (note the .ssh/config alias of github)
+#sed -i 's/github:alexconst/github:your_username/g' .gitmodules
 # bootstrap submodules
 git submodule init
 git submodule update
