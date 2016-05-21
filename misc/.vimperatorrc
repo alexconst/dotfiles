@@ -1,0 +1,124 @@
+"""""""""""""""""""""""""""
+" help
+"""""""""""""""""""""""""""
+" liberator://help/intro
+
+
+
+
+
+"""""""""""""""""""""""""""
+" navigation crash course
+"""""""""""""""""""""""""""
+
+" Shift+Esc     temporarily disable Vimperator
+" :saveas       prompt the user to where to save the webpage to disk
+
+" y             yank tab URL
+" Shift+y       yank selected text NOTE: currently not working for me
+" Ctrl+Shift+y  yank the page title (Note: this my own custom mapping)
+" c             enter caret mode
+" v             enter visual mode
+" To select and copy text:
+"   http://stackoverflow.com/questions/13696518/how-to-select-non-url-text-with-vimperator
+"   optional: use / and n to find some relevant text
+"   press c to enter caret mode and move to desired location
+"   press v to enter visual mode and choose selection
+"   press y to yank the text
+
+" Ctrl+c        cancel loading the current page
+" :stop         idem
+" Esc           escape from any mode
+" Ctrl+[        idem
+" Ctrl+l        focus on the URL bar
+" zi            zoom in
+" zo            zoom out
+" zz            zoom default
+" r             force reload page
+" Shift+r       force reload page skipping the cache
+
+" gH            open a new tab
+" Ctrl+w        close tab
+" u             undo closing tab
+" Ctrl+p        previous tab
+" Ctrl+n        next tab
+" :tabdu        duplicate current tab
+" <N>gt         go to the N-th tab
+" Ctrl+o        go to older navigation history (Note: this my own custom mapping)
+" Ctrl+i        go to newer navigation history (Note: this my own custom mapping)
+
+" f             show hints and open in current tab
+" Shift+f       show hints and open in new tab
+" ;;            focus on element
+" ;c            opens contextual menu on links
+" ;o            open in current tab
+" ;t            open in new tab
+" ;b            open in background tab
+" ;y            yank the link
+" ;Y            yank the link's text
+
+
+
+"""""""""""""""""""""""""""
+" settings
+"""""""""""""""""""""""""""
+
+" ignorecase on search
+set ignorecase
+
+" Show the link destination in the command line (left aligned)
+set showstatuslinks=2
+
+" yank the page title
+map <silent> <C-S-y> :js util.copyToClipboard(content.document.title, true)<CR>
+
+" select all text in input field with ctrl+a (or some bug infested times: ctrl+shift+a)
+inoremap <C-a> <C-Home><C-S-End>
+
+" esc mapping set to ,. (unfortunately is not possible to use jj like in vim)
+" http://superuser.com/questions/914770/use-a-key-sequence-to-escape-from-command-line-mode-in-vimperator
+"cnoremap ,. <Esc>      " the ctrl+c works better
+cnoremap <C-c> <Esc>
+" Exit insert mode using ctrl+c
+"imap <C-c> <Esc>
+" Exit insert mode using ctrl+c, and copy all the text in the input field.
+" caveat: when the field is empty when ctrl+c is pressed, it will write a
+" space in the input field; this was the work around found to avoid pasting
+" whatever you have left from your system's clipboard
+" TODO: see if it's possible to use document.activeElement with copyToClipboard
+"imap <C-c> <C-Home><space><C-S-Home><C-x><C-Home><C-S-End><C-x><C-v><Esc>
+"imap <C-c> <C-Home><C-S-End><C-x><C-v><Esc>
+" Exit insert mode using ctrl+c and copy any selected text (KISS)
+inoremap <C-c> <C-c><Esc>
+" Exit visual mode with ctrl+c (force copying text with y)
+vnoremap <C-c> <Esc>
+
+" make tab handling simpler when in insert mode
+imap <C-t> <Esc><C-t>
+imap <C-w> <Esc><C-w>
+
+" history navigation
+noremap <C-i> L
+noremap <C-o> H
+
+" clear search buffer
+nmap <silent> ,/ :nohlsearch<CR>
+
+" show numbers on each tab
+" NOTE: not working for me. I installed this addon instead: https://addons.mozilla.org/en-GB/firefox/addon/numberedtabs/
+" BUG: https://github.com/vimperator/vimperator-labs/issues/311
+" set tabnumbers
+
+
+
+
+
+"""""""""""""""""""""""""""
+" references:
+"""""""""""""""""""""""""""
+" https://raw.githubusercontent.com/cfree3/config/master/.vimperatorrc
+" https://github.com/vimperator/vimperator-labs/blob/master/common/content/modes.js
+
+
+" vim: set filetype=vim:
+
