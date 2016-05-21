@@ -43,6 +43,10 @@ cd ../dotfiles_private
 # logout and login
 exit
 vagrant ssh
+
+# now, after prezto has initialized, set HEAD to the tip of the master branch
+cd ${ZDOTDIR:-$HOME}/.zgen
+git checkout master
 ```
 
 
