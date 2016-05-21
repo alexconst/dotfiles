@@ -75,22 +75,12 @@ map <silent> <C-S-y> :js util.copyToClipboard(content.document.title, true)<CR>
 " select all text in input field with ctrl+a (or some bug infested times: ctrl+shift+a)
 inoremap <C-a> <C-Home><C-S-End>
 
-" esc mapping set to ,. (unfortunately is not possible to use jj like in vim)
-" http://superuser.com/questions/914770/use-a-key-sequence-to-escape-from-command-line-mode-in-vimperator
-"cnoremap ,. <Esc>      " the ctrl+c works better
+" map Ctrl+c to Esc
 cnoremap <C-c> <Esc>
-" Exit insert mode using ctrl+c
-"imap <C-c> <Esc>
-" Exit insert mode using ctrl+c, and copy all the text in the input field.
-" caveat: when the field is empty when ctrl+c is pressed, it will write a
-" space in the input field; this was the work around found to avoid pasting
-" whatever you have left from your system's clipboard
-" TODO: see if it's possible to use document.activeElement with copyToClipboard
-"imap <C-c> <C-Home><space><C-S-Home><C-x><C-Home><C-S-End><C-x><C-v><Esc>
-"imap <C-c> <C-Home><C-S-End><C-x><C-v><Esc>
-" Exit insert mode using ctrl+c and copy any selected text (KISS)
+
+" exit insert mode using Ctrl+c and copy any selected text (KISS)
 inoremap <C-c> <C-c><Esc>
-" Exit visual mode with ctrl+c (force copying text with y)
+" exit visual mode with Ctrl+c
 vnoremap <C-c> <Esc>
 
 " make tab handling simpler when in insert mode
