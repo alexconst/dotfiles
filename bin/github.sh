@@ -18,7 +18,7 @@ ${0##*/} CMD
 
     --fork REPO
         Clone REPO, using as remote HOST instead of 'github.com', from USER, and add upstream remote
-	It uses the github API and reads credentials from variables $GITHUB_USER and $GITHUB_PASS
+	It uses the github API and reads credentials from variables \$GITHUB_USER and \$GITHUB_PASS
 	If github API use fails it will assume the repo was forked via web, and will still clone from your USER
         Example: ${0##*/} --fork https://github.com/mitchellh/vagrant-aws
         This would clone from git@github/alexconst/vagrant-aws and add as upstream git@github/mitchellh/vagrant-aws
