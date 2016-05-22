@@ -26,6 +26,10 @@ ${0##*/} CMD
 
     --user USER
         by default 'alexconst' is used as USER
+
+Example:
+    ${0##*/} --fork "https://github.com/mitchellh/vagrant-aws" --host github --user alexconst
+
 EOF
 exit
 }
@@ -116,6 +120,17 @@ fi
 
 if [[ "$usercmd" == "--clone" ]]; then
     cmd="git clone $repo_target"
+    cmd_exec "$cmd"
+fi
+
+if [[ "$usercmd" == "--fork" ]]; then
+    upstream="$repo_target"
+    origin=$(echo $upstream | sed 's#\(.*:\)\(.*\)\(/.*\)#\1'$user'\3#')
+    cmd="git clone $origin"
+    cmd_exec "$cmd"
+    local_dir=$(echo $upstream | sed 's#.*/##')
+    cmd_exec "cd $local_dir"
+    cmd="git remote add upstream $upstream"
     cmd_exec "$cmd"
 fi
 
