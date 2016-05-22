@@ -31,6 +31,7 @@ ${0##*/} CMD
 
 Example:
     ${0##*/} --fork "https://github.com/mitchellh/vagrant-aws" --host github --user alexconst
+    ${0##*/} --fork "mitchellh/vagrant-aws"
 
 EOF
 exit
@@ -89,6 +90,13 @@ while :; do
 
     shift
 done
+
+
+# canonalize repo name
+if [[ ! "$repo" =~ ^https:// ]]; then
+    repo="https://github.com/$repo"
+fi
+
 
 if [[ "$dryrun" -eq 1 ]]; then
     printf "usercmd = %s\n" "$usercmd"
