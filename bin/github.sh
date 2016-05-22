@@ -18,10 +18,13 @@ ${0##*/} CMD
 
     --fork REPO
         Clone REPO, using as remote HOST instead of 'github.com', from USER, and add upstream remote
-	It uses the github API and reads credentials from variables \$GITHUB_USER and \$GITHUB_PASS
-	If github API use fails it will assume the repo was forked via web, and will still clone from your USER
+    It uses the github API and reads credentials from variables \$GITHUB_USER and \$GITHUB_PASS
+    If github API use fails it will assume the repo was forked via web, and will still clone from your USER
         Example: ${0##*/} --fork https://github.com/mitchellh/vagrant-aws
         This would clone from git@github/alexconst/vagrant-aws and add as upstream git@github/mitchellh/vagrant-aws
+
+    --submodule REPO
+        Similar to --fork, but instead of cloning the repo to the local system, it adds it as a submodule
 
     --host HOST
         By default 'github' is used as HOST
@@ -54,7 +57,7 @@ while :; do
         --dry-run)
             dryrun=1
             ;;
-        --clone|--fork|--host|--user)
+        --clone|--fork|--submodule|--host|--user)
             if [ -n "$2" ]; then
                 cmd="$1"
                 option="$2"
@@ -64,7 +67,7 @@ while :; do
                 exit 1
             fi
             ;;&         # ;;& allows bash to continue testing the next cases
-        --clone|--fork)
+        --clone|--fork|--submodule)
             usercmd="$cmd"
             repo="$option"
             ;;
@@ -96,6 +99,8 @@ done
 if [[ ! "$repo" =~ ^https:// ]]; then
     repo="https://github.com/$repo"
 fi
+origin=""
+upstream=""
 
 
 if [[ "$dryrun" -eq 1 ]]; then
@@ -123,27 +128,34 @@ cmd_exec () {
 
 
 # transform original github URL into something that uses our selected host
-if [[ "$usercmd" =~ --clone|--fork ]]; then
+if [[ "$usercmd" =~ --clone|--fork|--submodule ]]; then
     repo_target=$(echo $repo | sed -e 's#.*github.com.\(.*\)#git@'$host':\1#g; s#/$##')
 fi
 
 
-if [[ "$usercmd" == "--clone" ]]; then
+if [[ "$usercmd" =~ --clone ]]; then
     cmd="git clone $repo_target"
     cmd_exec "$cmd"
 fi
 
-if [[ "$usercmd" == "--fork" ]]; then
+if [[ "$usercmd" =~ --fork|--submodule ]]; then
     upstream="$repo_target"
     origin=$(echo $upstream | sed 's#\(.*:\)\(.*\)\(/.*\)#\1'$user'\3#')
-    # fork repo
+    # fork repo on github
     project=$(echo $upstream | sed 's#.*:##')
     cmd='curl -sS --user "$GITHUB_USER:$GITHUB_PASS" -X POST https://api.github.com/repos/'$project'/forks >/dev/null'
     cmd_exec "$cmd"
-    # clone from user
-    cmd="git clone $origin"
-    cmd_exec "$cmd"
-    # add upstream
+    if [[ "$usercmd" =~ --fork ]]; then
+        # clone from user
+        cmd="git clone $origin"
+        cmd_exec "$cmd"
+    fi
+    if [[ "$usercmd" =~ --submodule ]]; then
+        # add submodule
+        cmd="git submodule add $origin"
+        cmd_exec "$cmd"
+    fi
+    # add remote upstream
     local_dir=$(echo $upstream | sed 's#.*/##')
     cmd_exec "cd $local_dir"
     cmd="git remote add upstream $upstream"
