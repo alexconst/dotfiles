@@ -6,26 +6,28 @@ ${0##*/}: github wrapper to make life easier
 
 ${0##*/} CMD
     --help
-        display this help and exit
+        Display this help and exit
 
     --dry-run
-        don't do anything, just print what would be done
+        Don't do anything, just print what would be done
 
     --clone REPO
-        clone REPO using as remote HOST instead of 'github.com'
+        Clone REPO using as remote HOST instead of 'github.com'
         ('github' is defined in .ssh/config to use specific SSH keys)
-        example: ${0##*/} --clone https://github.com/mitchellh/vagrant-aws
+        Example: ${0##*/} --clone https://github.com/mitchellh/vagrant-aws
 
     --fork REPO
-        clone REPO, using as remote HOST instead of 'github.com', from USER, and add upstream remote
-        example: ${0##*/} --fork https://github.com/mitchellh/vagrant-aws
-        this would clone from git@github/alexconst/vagrant-aws and add as upstream git@github/mitchellh/vagrant-aws
+        Clone REPO, using as remote HOST instead of 'github.com', from USER, and add upstream remote
+	It uses the github API and reads credentials from variables $GITHUB_USER and $GITHUB_PASS
+	If github API use fails it will assume the repo was forked via web, and will still clone from your USER
+        Example: ${0##*/} --fork https://github.com/mitchellh/vagrant-aws
+        This would clone from git@github/alexconst/vagrant-aws and add as upstream git@github/mitchellh/vagrant-aws
 
     --host HOST
-        by default 'github' is used as HOST
+        By default 'github' is used as HOST
 
     --user USER
-        by default 'alexconst' is used as USER
+        By default 'alexconst' is used as USER
 
 Example:
     ${0##*/} --fork "https://github.com/mitchellh/vagrant-aws" --host github --user alexconst
@@ -126,8 +128,14 @@ fi
 if [[ "$usercmd" == "--fork" ]]; then
     upstream="$repo_target"
     origin=$(echo $upstream | sed 's#\(.*:\)\(.*\)\(/.*\)#\1'$user'\3#')
+    # fork repo
+    project=$(echo $upstream | sed 's#.*:##')
+    cmd='curl -sS --user "$GITHUB_USER:$GITHUB_PASS" -X POST https://api.github.com/repos/'$project'/forks >/dev/null'
+    cmd_exec "$cmd"
+    # clone from user
     cmd="git clone $origin"
     cmd_exec "$cmd"
+    # add upstream
     local_dir=$(echo $upstream | sed 's#.*/##')
     cmd_exec "cd $local_dir"
     cmd="git remote add upstream $upstream"
