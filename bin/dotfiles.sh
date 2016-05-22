@@ -279,6 +279,7 @@ else
     zsh_install
     bin_install
     misc_install "misc"
+    misc_install "vim"
 fi
 
 
