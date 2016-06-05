@@ -1,3 +1,6 @@
 [submodule "zsh/.zsh/.zgen"]
 	path = zsh/.zsh/.zgen
 	url = git@github:alexconst/zgen.git
+[submodule "vim/.vim/bundle/nerdcommenter"]
+	path = vim/.vim/bundle/nerdcommenter
+	url = git@github:alexconst/nerdcommenter
