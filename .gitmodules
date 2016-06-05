@@ -4,3 +4,6 @@
 [submodule "vim/.vim/bundle/nerdcommenter"]
 	path = vim/.vim/bundle/nerdcommenter
 	url = git@github:alexconst/nerdcommenter
+[submodule "vim/.vim/bundle/nerdtree"]
+	path = vim/.vim/bundle/nerdtree
+	url = git@github:alexconst/nerdtree
