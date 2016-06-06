@@ -103,10 +103,27 @@ nmap <silent> ,/ :nohlsearch<CR>
 " TODO: bind a function this mapping that only deletes N whitespace characters as to be tab aligned
 imap <S-tab> <Esc>xxxxa
 
-" efficient way to cycle through tabs:
-nnoremap <silent> <C-p> :tabprevious<CR>
-nnoremap <silent> <C-n> :tabnext<CR>
-nnoremap <silent> <C-c> :tabclose<CR>
+" cycle through buffers and tabs
+let g:mycycle = 0
+function! MyCycleMode()
+    if g:mycycle == 0
+        let g:mycycle = 1
+        " efficient way to cycle through tabs:
+        nnoremap <silent> <C-p> :tabprevious<CR>
+        nnoremap <silent> <C-n> :tabnext<CR>
+        nnoremap <silent> <C-c> :tabclose<CR>
+        echom 'will cycle over tabs'
+    else
+        let g:mycycle = 0
+        " efficient way to cycle through buffers:
+        nnoremap <silent> <C-p> :bprevious<CR>
+        nnoremap <silent> <C-n> :bnext<CR>
+        nnoremap <silent> <C-c> :bp<bar>sp<bar>bn<bar>bd<CR>
+        echom 'will cycle over buffers'
+    endif
+endfunction
+nnoremap <F4> :call MyCycleMode()<CR>
+silent call MyCycleMode()
 
 "I disabled this pseudo ctrl+tab since it isn't that useful, and was
 "overriding a pre-defined shortcut
@@ -136,6 +153,13 @@ set sessionoptions-=options
 
 " nerdcommenter
 filetype plugin on
+let g:NERDCommentEmptyLines = 1
+
+" nerdtree
+let NERDTreeShowHidden = 1
+"let g:NERDTreeDirArrows = 0 " only required if not in an UTF locale system
+"autocmd vimenter * NERDTree " automatically open the tree pane
+map <C-T> :NERDTreeToggle<CR>
 
 " source code completion
 set omnifunc=syntaxcomplete#Complete
