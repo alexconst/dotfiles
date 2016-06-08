@@ -154,6 +154,7 @@ set sessionoptions-=options
 " nerdcommenter
 filetype plugin on
 let g:NERDCommentEmptyLines = 1
+let g:NERDTrimTrailingWhitespace = 1
 
 " nerdtree
 let NERDTreeShowHidden = 1
