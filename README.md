@@ -7,6 +7,15 @@ Supports both public (eg: github) and private (eg: your private server) repos. I
 The adopted convention for private files is the same used by [YADR](https://github.com/skwp/dotfiles), where they use the suffix `*.user` (and eventual secrets will be stored in `.secrets`).
 
 
+# Requirements
+
+- `.ssh/config` needs to have a `github` entry configured for `github.com`. And because this is a personal environment, just copy all of the private dotfiles.
+    ```bash
+    # cd to the directory with the Vagrantfile
+    # cp -p -r $HOME/.../dotfiles_private dotfiles_private
+    ```
+
+
 # Install
 
 ```bash
@@ -21,8 +30,8 @@ cp -p -r /vagrant/dotfiles_private "$MYHOME/"
 for item in `find $MYHOME/dotfiles_private/ssh/.ssh/ -type f`; do ln -s `readlink -f "$item"` $HOME/.ssh/; done
 chmod 600 `readlink -f $HOME/.ssh/github_rsa`
 
-# clone this repo
-git clone git@github:alexconst/dotfiles.git
+# clone this repo (remove the echo if you're concerned about MitM attacks)
+echo "yes" | git clone git@github:alexconst/dotfiles.git
 cd dotfiles
 # tweak submodules to use your own repos (note the .ssh/config alias of github)
 #sed -i 's/github:alexconst/github:your_username/g' .gitmodules
