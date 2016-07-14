@@ -103,6 +103,8 @@ nmap <silent> ,/ :nohlsearch<CR>
 " TODO: bind a function this mapping that only deletes N whitespace characters as to be tab aligned
 imap <S-tab> <Esc>xxxxa
 
+" increase max num of tabs (useful for vim -p ...)
+set tabpagemax=100
 " cycle through buffers and tabs
 let g:mycycle = 0
 function! MyCycleMode()
